@@ -1,42 +1,57 @@
-# Deploy (Vercel + Supabase)
+# Deploy (Vercel + Supabase pelo Marketplace da Vercel)
 
-_Atualizado em 14/10/2026. **Nada foi publicado.** Todo passo que cria conta, projeto, domínio ou
-recurso remoto depende de autorização explícita do titular do projeto._
+_Atualizado em 14/10/2026. Passos com conta, projeto ou recurso remoto são executados pelo titular,
+com a própria conta. **Chaves e tokens nunca devem ser colados em conversas, issues ou commits.**_
 
-Ambos têm plano gratuito suficiente para o protótipo. Verifique os termos vigentes antes de aderir;
-não ative recursos pagos.
+Use sempre os planos **gratuitos** (Hobby na Vercel, Free no Supabase). Não ative recursos pagos.
 
-## 1. Supabase (banco)
+## Etapa 1 — Site no ar em modo demonstração (≈ 5 min)
 
-1. Crie um projeto com **sua conta pessoal** (região próxima: São Paulo, se disponível).
-2. SQL Editor → execute, em ordem:
-   - `supabase/migrations/20261014000000_estacoes_medicoes.sql`
-   - `supabase/seed.sql`
-3. Settings → API: copie a **Project URL**, a chave **publishable** e a chave **secret**.
-4. Não crie nenhuma política adicional sem revisar `docs/SEGURANCA.md`.
+1. Vercel → **Add New… → Project** → **Import Git Repository**.
+   - Se `hnryguchi/aerys` não aparecer: **Adjust GitHub App Permissions** → *Only select repositories* →
+     marque apenas `aerys`. O repositório **continua privado**; só o site fica público.
+2. Framework: Next.js (detectado). Em **Environment Variables**, adicione:
+   - `AERYS_DATA_SOURCE` = `demo`
+3. **Deploy**. Anote a URL de produção (ex.: `https://NOME-DO-PROJETO.vercel.app`).
+4. Settings → Environment Variables → adicione `NEXT_PUBLIC_SITE_URL` = essa URL (sem `/` no fim)
+   → Deployments → **Redeploy**.
 
-## 2. Vercel (site)
+Neste ponto o site já funciona publicamente, com o aviso “Dados demonstrativos”.
 
-1. Importe o repositório privado `aerys` com **sua conta pessoal**. O repositório continua privado;
-   apenas o site fica público.
-2. Variáveis de ambiente (Production):
+## Etapa 2 — Banco de dados (Supabase criado pela própria Vercel)
 
-| Variável | Valor |
-|---|---|
-| `AERYS_DATA_SOURCE` | `supabase` |
-| `NEXT_PUBLIC_SITE_URL` | URL definitiva (ex.: `https://aerys-xxxx.vercel.app` ou domínio próprio) |
-| `SUPABASE_URL` | Project URL |
-| `SUPABASE_PUBLISHABLE_KEY` | chave publishable |
-| `SUPABASE_SECRET_KEY` | chave secret (**nunca** com prefixo `NEXT_PUBLIC_`) |
-| `AERYS_DEVICE_TOKENS` | `aerys-001:<hash>` (de `npm run device:token`) |
+1. No projeto da Vercel: aba **Storage** → **Create Database** → **Supabase** → plano **Free**,
+   região mais próxima (ex.: São Paulo) → **Connect** ao projeto (ambientes Production e Preview).
+   A Vercel cria a conta/projeto Supabase e **injeta as variáveis** (`SUPABASE_URL`,
+   `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, …) automaticamente — você não copia chave nenhuma.
+2. Ainda em Storage, clique no banco → **Open in Supabase** → **SQL Editor** → **New query**:
+   - cole o conteúdo de `supabase/migrations/20261014000000_estacoes_medicoes.sql` → **Run**;
+   - nova query com o conteúdo de `supabase/seed.sql` → **Run**.
+   Ambos devem terminar com “Success. No rows returned”.
+3. **Não** crie políticas, tabelas ou chaves adicionais sem revisar `docs/SEGURANCA.md`.
 
-3. Deploy. Anote a URL.
+> Atenção: a integração também cria variáveis `NEXT_PUBLIC_SUPABASE_*`. A chave *anon* é pública por
+> natureza (protegida pela RLS); a **service role** nunca recebe prefixo `NEXT_PUBLIC_` — confira.
 
-> Sobre a URL: um subdomínio `*.vercel.app` com o nome do projeto é estável enquanto o projeto
-> existir, mas um domínio próprio é mais adequado para QR Codes impressos de longo prazo.
-> Compra de domínio e alteração de DNS dependem de autorização.
+## Etapa 3 — Token da placa e ativação dos dados reais
 
-## 3. Verificação pós-deploy (antes de gerar QR Codes definitivos)
+1. **Em um terminal seu, fora de qualquer assistente** (PowerShell comum), na pasta do projeto:
+   ```
+   npm run device:token -- aerys-001
+   ```
+   - a linha `#define AERYS_TOKEN "..."` vai para `firmware/aerys-estacao/secrets.h`;
+   - a linha `AERYS_DEVICE_TOKENS=aerys-001:...` vai para a Vercel (próximo passo).
+2. Vercel → Settings → Environment Variables:
+   - `AERYS_DEVICE_TOKENS` = `aerys-001:<hash>` (marque **Sensitive**)
+   - altere `AERYS_DATA_SOURCE` para `supabase`
+3. **Redeploy**. A estação passa a mostrar “Sem dados” (correto: nenhuma medição real ainda).
+
+## Etapa 4 — Placa enviando
+
+`secrets.h`: Wi-Fi, `AERYS_TOKEN`, `AERYS_URL_INGESTAO = "https://SUA-URL/api/v1/ingestao"` e a CA raiz
+(ver `firmware/README.md`). Grave a placa; o Monitor Serial deve mostrar `HTTP 201` e o site, **Online**.
+
+## Verificação pós-deploy (pode ser feita por qualquer pessoa, só usa endpoints públicos)
 
 ```bash
 SITE=https://SUA-URL
@@ -44,20 +59,23 @@ curl -s -o /dev/null -w "%{http_code}\n" $SITE/painel                       # 20
 curl -s -o /dev/null -w "%{http_code}\n" -X POST $SITE/api/v1/estacoes      # 405
 curl -s -w " %{http_code}\n" -X POST $SITE/api/v1/ingestao \
   -H 'content-type: application/json' -H 'x-aerys-station: aerys-001' \
-  -d '{"temperatura_c":20,"umidade_pct":50,"pressao_hpa":1000}'             # 401
+  -d '{"temperatura_c":20,"umidade_pct":50,"pressao_hpa":1000}'             # 401 (ou 503 no modo demo)
 curl -sI $SITE/painel | grep -i content-security-policy                     # presente
 ```
 
-E com a chave **publishable**, confirme que o banco recusa escrita direta:
+E a escrita direta no banco com a chave pública deve ser recusada (RLS) — teste no próprio
+SQL Editor do Supabase:
 
-```bash
-curl -s -w " %{http_code}\n" -X POST "$SUPABASE_URL/rest/v1/medicoes" \
-  -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -H 'content-type: application/json' \
-  -d '{"estacao_id":"aerys-001","temperatura_c":20}'                        # 401/403
+```sql
+set role anon;
+insert into public.medicoes (estacao_id, temperatura_c) values ('aerys-001', 20);  -- deve dar "permission denied"
+reset role;
 ```
 
-## 4. Firmware e QR
+## QR Code definitivo
 
-1. Ajuste `secrets.h`: `AERYS_URL_INGESTAO="https://SUA-URL/api/v1/ingestao"`, CA raiz, sem `AERYS_PERMITIR_HTTP`.
-2. Grave e confirme `HTTP 201` no Monitor Serial e **Online** no site.
-3. `npm run qr -- --site https://SUA-URL` → `saida/qrcodes/aerys-001.svg|png`.
+Com a URL de produção confirmada: `npm run qr -- --site https://SUA-URL` → `saida/qrcodes/aerys-001.svg|png`.
+Ou abra `https://SUA-URL/estacao/aerys-001/qr` (sem o aviso de TESTE quando `NEXT_PUBLIC_SITE_URL` está correta).
+
+> URL `*.vercel.app` é estável enquanto o projeto existir. Para QR impresso de longo prazo, um domínio
+> próprio é melhor — compra de domínio e DNS dependem de autorização.

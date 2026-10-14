@@ -17,6 +17,10 @@ export interface ServerConfig {
   supabase: { url: string; publishableKey: string; secretKey: string | undefined } | null;
 }
 
+function nonEmpty(v: string | undefined): string | undefined {
+  return v && v.trim() ? v.trim() : undefined;
+}
+
 /**
  * Lê e valida as variáveis de ambiente do servidor. Mensagens de erro citam
  * apenas NOMES de variáveis, nunca seus valores.
@@ -30,10 +34,19 @@ export function readServerConfig(env: NodeJS.ProcessEnv = process.env): ServerCo
   const e = parsed.data;
   let supabase: ServerConfig["supabase"] = null;
   if (e.AERYS_DATA_SOURCE === "supabase") {
-    if (!e.SUPABASE_URL || !e.SUPABASE_PUBLISHABLE_KEY) {
-      throw new Error("Modo supabase requer SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY");
+    // Aceita também os nomes injetados pela integração Supabase do Marketplace da Vercel.
+    const url = e.SUPABASE_URL ?? nonEmpty(env.NEXT_PUBLIC_SUPABASE_URL);
+    const publishableKey = e.SUPABASE_PUBLISHABLE_KEY ?? nonEmpty(env.SUPABASE_ANON_KEY) ?? nonEmpty(env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    const secretKey = e.SUPABASE_SECRET_KEY ?? nonEmpty(env.SUPABASE_SERVICE_ROLE_KEY);
+    if (!url || !publishableKey) {
+      throw new Error("Modo supabase requer SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY (ou SUPABASE_ANON_KEY)");
     }
-    supabase = { url: e.SUPABASE_URL.replace(/\/+$/, ""), publishableKey: e.SUPABASE_PUBLISHABLE_KEY, secretKey: e.SUPABASE_SECRET_KEY };
+    try {
+      new URL(url);
+    } catch {
+      throw new Error("Configuração inválida nas variáveis: SUPABASE_URL");
+    }
+    supabase = { url: url.replace(/\/+$/, ""), publishableKey, secretKey };
   }
   return {
     dataSource: e.AERYS_DATA_SOURCE,

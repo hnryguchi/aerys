@@ -97,6 +97,15 @@ describe("configuração", () => {
   it("padrão é demo", () => {
     expect(readServerConfig({} as NodeJS.ProcessEnv).dataSource).toBe("demo");
   });
+  it("aceita os nomes injetados pela integração Supabase da Vercel", () => {
+    const cfg = readServerConfig({
+      AERYS_DATA_SOURCE: "supabase",
+      SUPABASE_URL: "https://abc.supabase.co/",
+      SUPABASE_ANON_KEY: "anon-123",
+      SUPABASE_SERVICE_ROLE_KEY: "service-456",
+    } as unknown as NodeJS.ProcessEnv);
+    expect(cfg.supabase).toEqual({ url: "https://abc.supabase.co", publishableKey: "anon-123", secretKey: "service-456" });
+  });
   it("modo supabase exige variáveis e não expõe valores no erro", () => {
     expect(() => readServerConfig({ AERYS_DATA_SOURCE: "supabase", SUPABASE_SECRET_KEY: "segredo123" } as unknown as NodeJS.ProcessEnv)).toThrow(
       /SUPABASE_URL/,
