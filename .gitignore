@@ -1,0 +1,50 @@
+# --- Segredos e credenciais (nunca versionar) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+firmware/**/secrets.h
+firmware/**/credentials.h
+
+# --- Dependências ---
+node_modules/
+.pnp
+.pnp.*
+
+# --- Builds e caches gerados ---
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+.supabase/
+firmware/**/.pio/
+
+# --- Logs locais ---
+*.log
+npm-debug.log*
+logs/
+
+# --- Configurações pessoais / do sistema ---
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Dados locais e arquivos fora do projeto ---
+data/local/
+*.sqlite
+*.db
+*.csv.local
+
+# --- Saídas geradas localmente ---
+saida/

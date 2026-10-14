@@ -1,0 +1,41 @@
+{
+  "name": "aerys",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AERYS — plataforma de monitoramento ambiental urbano.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "audit:deps": "npm audit --omit=dev",
+    "dev:lan": "next dev -H 0.0.0.0",
+    "device:token": "node scripts/gerar-token-dispositivo.mjs",
+    "qr": "node scripts/gerar-qrcodes.mjs",
+    "test:rls": "vitest run tests/rls.test.ts",
+    "test:rls:docker": "bash supabase/tests/run-rls-test.sh"
+  },
+  "dependencies": {
+    "next": "16.4.1",
+    "qrcode": "1.5.4",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.10",
+    "@types/node": "24.19.2",
+    "@types/qrcode": "1.5.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3",
+    "vitest": "5.0.4"
+  }
+}
