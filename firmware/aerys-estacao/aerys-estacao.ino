@@ -1,5 +1,5 @@
 /*
- * AERYS — firmware da estação (ESP32 DevKit V1 + sensor I2C + OLED SSD1306)
+ * AERYS: firmware da estação (ESP32 DevKit V1 + sensor I2C + OLED SSD1306)
  *
  * Sensores suportados (detecção automática no barramento I2C):
  *   - módulo AHT20 + BMP280 (temperatura/umidade no AHT20, pressão no BMP280)

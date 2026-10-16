@@ -2,7 +2,7 @@
 // Gera QR Codes (SVG e PNG) das estações apontando para a URL pública DEFINITIVA.
 // Uso: npm run qr -- --site https://seu-dominio.com.br [--estacoes aerys-001,aerys-002]
 // Recusa HTTP, localhost, IPs privados e túneis temporários.
-// O QR contém apenas a URL pública da estação — nunca tokens, senhas ou dados de Wi-Fi.
+// O QR contém apenas a URL pública da estação, nunca tokens, senhas ou dados de Wi-Fi.
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import QRCode from "qrcode";

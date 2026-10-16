@@ -1,4 +1,4 @@
-// AERYS — configurações NÃO secretas da estação.
+// AERYS: configurações NÃO secretas da estação.
 // Segredos (Wi-Fi, token, URL) ficam em secrets.h, que não é versionado.
 #pragma once
 

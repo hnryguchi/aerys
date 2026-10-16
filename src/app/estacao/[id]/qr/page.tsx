@@ -44,7 +44,7 @@ export default async function QrPage({ params }: Params) {
         {!check.ok && (
           <div className="demo-banner no-print" role="alert" style={{ textAlign: "left" }}>
             <span>
-              <strong>QR Code de TESTE — não imprimir como definitivo.</strong> {check.motivo} Este código aponta para o
+              <strong>QR Code de TESTE. Não imprimir como definitivo.</strong> {check.motivo} Este código aponta para o
               endereço atual ({base}), que pode ser temporário.
             </span>
           </div>
@@ -60,7 +60,7 @@ export default async function QrPage({ params }: Params) {
         </p>
         {!check.ok && (
           <p style={{ fontWeight: 700, color: "var(--serious-ink)" }}>
-            TESTE — endereço não definitivo
+            TESTE: endereço não definitivo
           </p>
         )}
         <div className="btn-row no-print" style={{ justifyContent: "center", marginTop: 16 }}>

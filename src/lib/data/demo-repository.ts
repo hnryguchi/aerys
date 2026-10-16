@@ -4,7 +4,7 @@ import type { Measurement, Period, Station } from "../domain/types";
 import type { MeasurementReader } from "./repository";
 
 /**
- * DADOS DEMONSTRATIVOS — NÃO SÃO MEDIÇÕES REAIS.
+ * DADOS DEMONSTRATIVOS: NÃO SÃO MEDIÇÕES REAIS.
  * Série sintética determinística (ciclo diário + ruído pseudoaleatório),
  * usada apenas para visualizar a interface antes da integração da estação.
  */

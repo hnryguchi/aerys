@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl() ?? "http://localhost:3000"),
-  title: { default: "AERYS — monitoramento ambiental urbano", template: "%s · AERYS" },
+  title: { default: "AERYS | Monitoramento ambiental urbano", template: "%s · AERYS" },
   description: "Plataforma aberta à consulta de dados ambientais urbanos: temperatura, umidade e pressão atmosférica por estação.",
   applicationName: "AERYS",
   appleWebApp: { capable: true, title: "AERYS", statusBarStyle: "black-translucent" },

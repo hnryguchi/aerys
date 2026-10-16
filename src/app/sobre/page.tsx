@@ -9,7 +9,7 @@ export default function SobrePage() {
       <h1>Sobre o AERYS</h1>
       <p>
         O AERYS é uma plataforma de monitoramento ambiental urbano que busca tornar dados ambientais mais acessíveis a
-        estudantes, professores e moradores — e, no futuro, a pesquisadores e gestores públicos.
+        estudantes, professores e moradores e, no futuro, a pesquisadores e gestores públicos.
       </p>
 
       <h2>Situação atual</h2>
@@ -21,7 +21,7 @@ export default function SobrePage() {
       </p>
       <p>
         Quando a plataforma estiver exibindo dados simulados, isso é indicado com o aviso
-        “Dados demonstrativos — não são medições reais”.
+        “Dados demonstrativos: não são medições reais”.
       </p>
 
       <h2>Hardware da primeira estação</h2>
@@ -35,7 +35,7 @@ export default function SobrePage() {
       <p>
         A estação lê os sensores e envia as medições pela internet a um endpoint autenticado, com uma credencial exclusiva
         do dispositivo. O servidor valida os dados, registra o horário de recebimento e os armazena. O painel público
-        apenas <em>consulta</em> essas medições — não é possível enviar, alterar ou excluir dados pelas páginas públicas.
+        apenas <em>consulta</em> essas medições. Não é possível enviar, alterar ou excluir dados pelas páginas públicas.
       </p>
 
       <h2>Estado de conexão</h2>

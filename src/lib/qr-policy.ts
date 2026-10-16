@@ -1,7 +1,7 @@
 /**
  * Política de URLs para QR Codes: somente HTTPS em domínio público.
  * Bloqueia localhost, IPs privados e serviços de túnel temporário.
- * O QR contém apenas a URL pública da estação — nunca tokens, senhas ou Wi-Fi.
+ * O QR contém apenas a URL pública da estação, nunca tokens, senhas ou Wi-Fi.
  */
 const TEMPORARY_HOST_PATTERNS = [
   /(^|\.)localhost$/i,

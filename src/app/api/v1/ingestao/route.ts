@@ -9,7 +9,7 @@ import { ingestSchema, MAX_INGEST_BODY_BYTES, stationIdSchema } from "@/lib/secu
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/v1/ingestao — única rota de escrita.
+ * POST /api/v1/ingestao: única rota de escrita.
  * Cabeçalhos: Authorization: Bearer <token do dispositivo>, X-Aerys-Station: aerys-NNN
  * O horário da medição é o horário de RECEBIMENTO no servidor.
  */

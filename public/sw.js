@@ -1,4 +1,4 @@
-/* AERYS service worker — instalação como app e página offline.
+/* AERYS service worker: instalação como app e página offline.
  * Estratégias:
  *  - navegação: rede primeiro; sem rede, última versão em cache ou /offline
  *  - /_next/static e ícones: cache primeiro (arquivos imutáveis)

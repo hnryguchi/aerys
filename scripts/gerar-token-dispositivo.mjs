@@ -16,7 +16,7 @@ const hash = createHash("sha256").update(token, "utf8").digest("hex");
 console.log(`
 Estação: ${id}
 
-1) Firmware (secrets.h) — NÃO compartilhe, NÃO versione:
+1) Firmware (secrets.h). NÃO compartilhe, NÃO versione:
    #define AERYS_TOKEN "${token}"
 
 2) Servidor (variável de ambiente; acrescente separado por vírgula se já houver outras):
