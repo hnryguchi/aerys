@@ -1,6 +1,6 @@
 # Firmware da estação AERYS
 
-_Versão 0.1.0 — 14/10/2026. Status: escrito, **ainda não compilado nem gravado**._
+_Versão 0.1.0, 16/10/2026. Status: compila com arduino-cli (esp32:esp32:esp32); gravação na placa pendente._
 
 ## Preparação (Arduino IDE 2.x)
 
@@ -43,18 +43,24 @@ mudar para **Online**. Remova `AERYS_PERMITIR_HTTP` depois do teste.
 
 ## Certificado HTTPS (produção)
 
-O firmware valida o servidor com o certificado raiz (CA) do domínio. Para obter a CA do domínio
-definitivo, com o site já publicado:
+O firmware valida o servidor com certificados raiz (CA) públicos, já incluídos em
+`aerys-estacao/ca_raizes.h` (versionado, não é segredo): GTS Root R1/R4 e GlobalSign Root CA
+(domínios `*.vercel.app`) e ISRG Root X1/X2 (Let's Encrypt, domínios próprios na Vercel).
+Não é preciso colar certificado no `secrets.h`.
+
+Use no `AERYS_URL_INGESTAO` o **domínio de produção** do projeto (Vercel → Settings → Domains).
+As URLs de cada deploy (`projeto-abc123-time.vercel.app`) ficam atrás do login da Vercel e
+respondem com redirecionamento, o que aparece como falha de envio.
+
+Para conferir a cadeia de um domínio:
 
 ```bash
 openssl s_client -connect SEU-DOMINIO:443 -showcerts </dev/null
 ```
 
-No último certificado exibido, leia o campo `issuer` (por exemplo, `ISRG Root X1`). Baixe esse
-**certificado raiz** do site oficial da autoridade certificadora (formato PEM) e cole-o em
-`AERYS_CA_RAIZ`. Prefira a raiz em vez da intermediária, que muda com mais frequência.
-Se a hospedagem trocar de autoridade certificadora, o envio falhará (o OLED mostra “Falha envio”)
-e a CA precisa ser atualizada. Teste sempre na bancada antes de instalar a estação.
+Se a hospedagem passar a usar outra autoridade certificadora, o envio falha (o OLED mostra
+“Falha envio: -1”). Nesse caso, defina `AERYS_CA_PROPRIA` e `AERYS_CA_RAIZ` no `secrets.h`
+(modelo em `secrets.example.h`) ou atualize `ca_raizes.h`.
 
 ## Códigos no display / Serial
 

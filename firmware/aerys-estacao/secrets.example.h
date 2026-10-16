@@ -21,10 +21,11 @@
 // Descomente SOMENTE para testes de bancada em rede local confiável.
 // #define AERYS_PERMITIR_HTTP
 
-// Certificado raiz (CA) do domínio de produção, em formato PEM.
-// Veja firmware/README.md ("Certificado HTTPS") para obter o certificado correto.
-static const char AERYS_CA_RAIZ[] PROGMEM = R"PEM(
------BEGIN CERTIFICATE-----
-COLE-AQUI-O-CERTIFICADO-RAIZ
------END CERTIFICATE-----
-)PEM";
+// Certificado HTTPS: o firmware já traz as raízes públicas da Vercel em ca_raizes.h.
+// Só para outro servidor/CA: descomente as linhas abaixo e cole o certificado raiz (PEM).
+// #define AERYS_CA_PROPRIA
+// static const char AERYS_CA_RAIZ[] PROGMEM = R"PEM(
+// -----BEGIN CERTIFICATE-----
+// ...
+// -----END CERTIFICATE-----
+// )PEM";

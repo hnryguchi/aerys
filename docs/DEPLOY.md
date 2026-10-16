@@ -48,8 +48,9 @@ Neste ponto o site já funciona publicamente, com o aviso “Dados demonstrativo
 
 ## Etapa 4 — Placa enviando
 
-`secrets.h`: Wi-Fi, `AERYS_TOKEN`, `AERYS_URL_INGESTAO = "https://SUA-URL/api/v1/ingestao"` e a CA raiz
-(ver `firmware/README.md`). Grave a placa; o Monitor Serial deve mostrar `HTTP 201` e o site, **Online**.
+`secrets.h`: Wi-Fi (rede 2,4 GHz), `AERYS_TOKEN` e `AERYS_URL_INGESTAO = "https://SUA-URL/api/v1/ingestao"`,
+usando o domínio de produção (Settings → Domains). A CA já vem em `ca_raizes.h` (ver `firmware/README.md`).
+Grave a placa; o Monitor Serial deve mostrar `HTTP 201` e o site, **Online**.
 
 ## Verificação pós-deploy (pode ser feita por qualquer pessoa, só usa endpoints públicos)
 

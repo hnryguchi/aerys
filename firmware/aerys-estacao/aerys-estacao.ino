@@ -32,6 +32,7 @@
 #include <math.h>
 
 #include "config.h"
+#include "ca_raizes.h"
 #if __has_include("secrets.h")
 #include "secrets.h"
 #else
@@ -207,7 +208,11 @@ int enviarMedicao(const Leitura& l) {
   WiFiClient clienteSimples;
 
   if (https) {
-    clienteSeguro.setCACert(AERYS_CA_RAIZ);
+#ifdef AERYS_CA_PROPRIA
+    clienteSeguro.setCACert(AERYS_CA_RAIZ);  // CA definida em secrets.h
+#else
+    clienteSeguro.setCACert(AERYS_CA_RAIZES);  // raízes públicas de ca_raizes.h
+#endif
     if (!http.begin(clienteSeguro, url)) return -1;
   } else {
 #ifdef AERYS_PERMITIR_HTTP
