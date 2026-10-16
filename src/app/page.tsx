@@ -22,7 +22,7 @@ export default async function HomePage() {
           <p className="eyebrow">Monitoramento ambiental urbano</p>
           <h1>O ar da cidade, em dados que qualquer pessoa entende.</h1>
           <p className="lead">
-            O AERYS reúne medições de estações ambientais de baixo custo e as apresenta de forma aberta e acessível —
+            O AERYS reúne medições de estações ambientais de baixo custo e as apresenta de forma aberta e acessível,
             no celular ou no computador.
           </p>
           <div className="btn-row">
@@ -77,7 +77,7 @@ export default async function HomePage() {
             </li>
             <li>
               <strong>Painel público</strong>
-              <span className="small muted">Qualquer pessoa consulta — inclusive por QR Code.</span>
+              <span className="small muted">Qualquer pessoa consulta, inclusive por QR Code.</span>
             </li>
           </ol>
         </div>

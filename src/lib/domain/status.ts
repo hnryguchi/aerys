@@ -28,8 +28,8 @@ export function deriveStatus(
 }
 
 export const STATUS_LABEL: Record<ConnectivityStatus, string> = {
-  demonstracao: "Demonstração — sem estação física conectada",
-  online: "Online — comunicação recente",
+  demonstracao: "Demonstração, sem estação física conectada",
+  online: "Online, comunicação recente",
   "sem-comunicacao": "Sem comunicação recente",
   "sem-dados": "Sem dados recebidos",
 };

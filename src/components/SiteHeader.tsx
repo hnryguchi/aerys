@@ -15,7 +15,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container">
-        <Link href="/" className="brand" aria-label="AERYS — página inicial">
+        <Link href="/" className="brand" aria-label="AERYS, página inicial">
           <LogoMark />
           <span>AERYS</span>
         </Link>

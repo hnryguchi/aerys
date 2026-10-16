@@ -115,7 +115,7 @@ export default async function EstacaoPage({ params, searchParams }: Params) {
           <dt>Identificador</dt>
           <dd>{station.id}</dd>
           <dt>Sensores</dt>
-          <dd>{station.sensores.join(" · ") || "—"}</dd>
+          <dd>{station.sensores.join(" · ") || "sem dado"}</dd>
           <dt>Envio esperado</dt>
           <dd>a cada {station.intervaloEsperadoS} s</dd>
           <dt>Fonte dos dados</dt>

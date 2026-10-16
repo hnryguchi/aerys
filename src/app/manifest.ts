@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "AERYS — monitoramento ambiental urbano",
+    name: "AERYS | Monitoramento ambiental urbano",
     short_name: "AERYS",
     description: "Temperatura, umidade e pressão atmosférica das estações AERYS.",
     lang: "pt-BR",

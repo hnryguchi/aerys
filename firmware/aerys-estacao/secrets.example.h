@@ -1,4 +1,4 @@
-// AERYS — MODELO de segredos da estação.
+// AERYS: MODELO de segredos da estação.
 // 1. Copie este arquivo para "secrets.h" (mesma pasta). secrets.h é ignorado pelo Git.
 // 2. Preencha os valores. NUNCA coloque chaves do banco de dados aqui.
 #pragma once

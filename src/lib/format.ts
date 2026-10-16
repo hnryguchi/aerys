@@ -2,14 +2,14 @@ export const TIME_ZONE = "America/Sao_Paulo";
 const LOCALE = "pt-BR";
 
 export function formatNumber(v: number | null | undefined, decimals: number, grouping = true): string {
-  if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  if (v === null || v === undefined || !Number.isFinite(v)) return "sem dado";
   return new Intl.NumberFormat(LOCALE, { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: grouping }).format(v);
 }
 
 export function formatDateTime(iso: string | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso) return "sem dado";
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "sem dado";
   return new Intl.DateTimeFormat(LOCALE, { timeZone: TIME_ZONE, dateStyle: "short", timeStyle: "short" }).format(d);
 }
 

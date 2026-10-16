@@ -2,7 +2,7 @@
   "name": "aerys",
   "version": "0.1.0",
   "private": true,
-  "description": "AERYS — plataforma de monitoramento ambiental urbano.",
+  "description": "AERYS: plataforma de monitoramento ambiental urbano.",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=20.9"
