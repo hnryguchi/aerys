@@ -173,9 +173,16 @@ void garantirWifi() {
   if (WiFi.status() == WL_CONNECTED) return;
   unsigned long agora = millis();
   if (ultimoWifiTentativaMs != 0 && agora - ultimoWifiTentativaMs < TIMEOUT_WIFI_MS) return;
+  if (ultimoWifiTentativaMs != 0) {
+    wl_status_t st = WiFi.status();
+    Serial.printf("[wifi] falhou: %s\n", st == WL_NO_SSID_AVAIL   ? "rede nao encontrada (nome errado ou 5 GHz)"
+                                         : st == WL_CONNECT_FAILED ? "senha recusada"
+                                                                   : "sem resposta da rede");
+  }
   ultimoWifiTentativaMs = agora;
   Serial.println("[wifi] conectando...");
   WiFi.mode(WIFI_STA);
+  WiFi.disconnect();  // encerra a tentativa anterior antes de começar outra
   WiFi.begin(WIFI_SSID, WIFI_SENHA);
 }
 
