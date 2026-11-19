@@ -3,8 +3,8 @@
 Plataforma de monitoramento ambiental urbano: estações de baixo custo (ESP32) enviam
 temperatura, umidade e pressão para um painel público, acessível também por QR Code.
 
-> Repositório **privado**. O site é público; o código-fonte não.
-> Software proprietário — todos os direitos reservados (ver `package.json`: `UNLICENSED`).
+> Código visível para fins de portfólio. **Todos os direitos reservados** (`UNLICENSED`): não é permitido copiar, modificar ou redistribuir sem autorização do autor.
+> Projeto pessoal; nenhum dado real de terceiros neste repositório.
 
 ## Estado atual (14/10/2026)
 
