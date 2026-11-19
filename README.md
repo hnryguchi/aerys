@@ -1,5 +1,7 @@
 # AERYS
 
+**Português** · [English](README.en.md)
+
 Plataforma de monitoramento ambiental urbano: estações de baixo custo (ESP32) enviam
 temperatura, umidade e pressão para um painel público, acessível também por QR Code.
 
