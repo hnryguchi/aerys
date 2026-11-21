@@ -65,6 +65,9 @@ export class LocalFileRepository implements MeasurementReader, MeasurementWriter
       temperaturaC: m.temperaturaC,
       umidadePct: m.umidadePct,
       pressaoHpa: m.pressaoHpa,
+      eco2Ppm: m.eco2Ppm ?? null,
+      tvocPpb: m.tvocPpb ?? null,
+      iqaUba: m.iqaUba ?? null,
     };
     await mkdir(path.dirname(this.file), { recursive: true });
     await appendFile(this.file, JSON.stringify(record) + "\n", "utf8");

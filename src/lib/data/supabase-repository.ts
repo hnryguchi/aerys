@@ -23,7 +23,13 @@ interface MedicaoRow {
   temperatura_c: number | null;
   umidade_pct: number | null;
   pressao_hpa: number | null;
+  eco2_ppm?: number | null;
+  tvoc_ppb?: number | null;
+  iqa_uba?: number | null;
 }
+
+const COLS_BASE = "estacao_id,medido_em,temperatura_c,umidade_pct,pressao_hpa";
+const COLS_AR = `${COLS_BASE},eco2_ppm,tvoc_ppb,iqa_uba`;
 
 function headersFor(key: string): Record<string, string> {
   const h: Record<string, string> = { apikey: key, "Content-Type": "application/json" };
@@ -50,6 +56,9 @@ function toMeasurement(r: MedicaoRow): Measurement {
     temperaturaC: r.temperatura_c,
     umidadePct: r.umidade_pct,
     pressaoHpa: r.pressao_hpa,
+    eco2Ppm: r.eco2_ppm ?? null,
+    tvocPpb: r.tvoc_ppb ?? null,
+    iqaUba: r.iqa_uba ?? null,
   };
 }
 
@@ -87,9 +96,15 @@ export class SupabaseRepository implements MeasurementReader, MeasurementWriter 
   }
 
   async getLatest(stationId: string): Promise<Measurement | null> {
-    const rows = await this.get<MedicaoRow[]>(
-      `medicoes?select=estacao_id,medido_em,temperatura_c,umidade_pct,pressao_hpa&estacao_id=eq.${encodeURIComponent(stationId)}&order=medido_em.desc&limit=1`,
-    );
+    const q = `&estacao_id=eq.${encodeURIComponent(stationId)}&order=medido_em.desc&limit=1`;
+    let rows: MedicaoRow[];
+    try {
+      rows = await this.get<MedicaoRow[]>(`medicoes?select=${COLS_AR}${q}`);
+    } catch (err) {
+      // Banco ainda sem as colunas do sensor de ar (migração pendente): lê só o clima.
+      if (!(err instanceof DataUnavailableError) || !/HTTP 400/.test(err.message)) throw err;
+      rows = await this.get<MedicaoRow[]>(`medicoes?select=${COLS_BASE}${q}`);
+    }
     return rows[0] ? toMeasurement(rows[0]) : null;
   }
 
@@ -106,7 +121,7 @@ export class SupabaseRepository implements MeasurementReader, MeasurementWriter 
       }),
     });
     if (!res.ok) throw new DataUnavailableError(`Histórico falhou (HTTP ${res.status})`);
-    const rows = (await res.json()) as { bucket: string; temperatura_c: number | null; umidade_pct: number | null; pressao_hpa: number | null }[];
+    const rows = (await res.json()) as (Omit<MedicaoRow, "estacao_id" | "medido_em"> & { bucket: string })[];
     return rows.map((r) => toMeasurement({ ...r, estacao_id: stationId, medido_em: r.bucket }));
   }
 
@@ -122,6 +137,10 @@ export class SupabaseRepository implements MeasurementReader, MeasurementWriter 
         temperatura_c: m.temperaturaC,
         umidade_pct: m.umidadePct,
         pressao_hpa: m.pressaoHpa,
+        // Colunas do sensor de ar só vão quando há valor (compatível com banco sem a migração).
+        ...(m.eco2Ppm != null ? { eco2_ppm: m.eco2Ppm } : {}),
+        ...(m.tvocPpb != null ? { tvoc_ppb: m.tvocPpb } : {}),
+        ...(m.iqaUba != null ? { iqa_uba: m.iqaUba } : {}),
         rssi_dbm: m.rssiDbm,
         firmware: m.firmware,
       }),

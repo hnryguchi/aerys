@@ -4,7 +4,7 @@
 
 -- Dados de teste: estação pública com medição + estação privada com medição.
 insert into public.estacoes (id, nome, publico) values ('aerys-900', 'Privada de teste', false);
-insert into public.medicoes (estacao_id, temperatura_c, umidade_pct, pressao_hpa) values ('aerys-001', 24.5, 60, 1012.0);
+insert into public.medicoes (estacao_id, temperatura_c, umidade_pct, pressao_hpa, eco2_ppm, tvoc_ppb, iqa_uba) values ('aerys-001', 24.5, 60, 1012.0, 650, 120, 2);
 insert into public.medicoes (estacao_id, temperatura_c, umidade_pct, pressao_hpa) values ('aerys-900', 30.0, 40, 1000.0);
 
 -- ===== anon =====
@@ -17,6 +17,8 @@ do $$ begin
   if exists (select 1 from public.medicoes where estacao_id = 'aerys-900') then raise exception 'anon leu medição privada'; end if;
   if (select count(*) from public.medicoes_agregadas('aerys-900', now() - interval '1 day', 10)) <> 0 then raise exception 'RPC vazou estação privada'; end if;
   if (select count(*) from public.medicoes_agregadas('aerys-001', now() - interval '1 day', 10)) <> 1 then raise exception 'RPC deveria agregar estação pública'; end if;
+  if (select eco2_ppm from public.medicoes where estacao_id = 'aerys-001' limit 1) <> 650 then raise exception 'anon deveria ler eco2_ppm'; end if;
+  if (select eco2_ppm from public.medicoes_agregadas('aerys-001', now() - interval '1 day', 10) limit 1) <> 650 then raise exception 'RPC deveria agregar eco2_ppm'; end if;
 end $$;
 
 do $$ begin
@@ -63,6 +65,9 @@ do $$ begin
   exception when check_violation then null; end;
   begin insert into public.medicoes (estacao_id) values ('aerys-001'); raise exception 'FALHA: aceitou medição vazia';
   exception when check_violation then null; end;
+  begin insert into public.medicoes (estacao_id, eco2_ppm) values ('aerys-001', 100); raise exception 'FALHA: aceitou eco2 100';
+  exception when check_violation then null; end;
+  insert into public.medicoes (estacao_id, eco2_ppm, tvoc_ppb, iqa_uba) values ('aerys-001', 900, 300, 3);
   begin insert into public.medicoes (estacao_id, temperatura_c) values ('aerys-777', 20); raise exception 'FALHA: aceitou estação inexistente';
   exception when foreign_key_violation then null; end;
 end $$;

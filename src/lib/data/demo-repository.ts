@@ -42,6 +42,10 @@ export function demoMeasurementAt(stationId: string, tMs: number): Measurement {
   const dayShift = smoothDaily(tMs, 7) * 2.5;
   const temp = 23 + dayShift + 5 * diurnal + noise(step, 11) * 0.4;
   const umid = 68 - dayShift * 2 - 17 * diurnal + noise(step, 13) * 2;
+  // CO₂ sobe no horário de visitação (10h às 17h) e cai à noite.
+  const ocupacao = Math.max(0, Math.sin(((hourLocal - 10) / 14) * Math.PI));
+  const eco2 = 450 + 520 * ocupacao + noise(step, 23) * 40;
+  const tvoc = 60 + 260 * ocupacao + noise(step, 29) * 20;
   const pres = 1014 + smoothDaily(tMs, 17) * 3 + 1.2 * Math.sin((hourLocal / 12) * 2 * Math.PI) + noise(step, 19) * 0.2;
   return {
     stationId,
@@ -49,6 +53,9 @@ export function demoMeasurementAt(stationId: string, tMs: number): Measurement {
     temperaturaC: round(temp, 1),
     umidadePct: round(Math.min(100, Math.max(0, umid)), 0),
     pressaoHpa: round(pres, 1),
+    eco2Ppm: Math.round(eco2),
+    tvocPpb: Math.max(0, Math.round(tvoc)),
+    iqaUba: eco2 < 600 ? 1 : eco2 < 800 ? 2 : eco2 < 1000 ? 3 : eco2 < 1500 ? 4 : 5,
   };
 }
 

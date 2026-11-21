@@ -17,12 +17,21 @@ function metricField(key: "temperaturaC" | "umidadePct" | "pressaoHpa") {
   return z.number().finite().min(d.min).max(d.max).nullable();
 }
 
+/** Campos do sensor de ar (ENS160): opcionais para manter compatível o firmware sem o sensor. */
+function intField(key: "eco2Ppm" | "tvocPpb") {
+  const d = getMetric(key);
+  return z.number().int().min(d.min).max(d.max).nullable().optional();
+}
+
 /** Corpo aceito na ingestão. Campos desconhecidos são rejeitados. */
 export const ingestSchema = z
   .object({
     temperatura_c: metricField("temperaturaC"),
     umidade_pct: metricField("umidadePct"),
     pressao_hpa: metricField("pressaoHpa"),
+    eco2_ppm: intField("eco2Ppm"),
+    tvoc_ppb: intField("tvocPpb"),
+    iqa_uba: z.number().int().min(1).max(5).nullable().optional(),
     rssi_dbm: z.number().int().min(-127).max(0).nullable().optional(),
     firmware: z
       .string()
@@ -32,7 +41,7 @@ export const ingestSchema = z
       .optional(),
   })
   .strict()
-  .refine((b) => b.temperatura_c !== null || b.umidade_pct !== null || b.pressao_hpa !== null, {
+  .refine((b) => b.temperatura_c !== null || b.umidade_pct !== null || b.pressao_hpa !== null || b.eco2_ppm != null, {
     message: "Ao menos uma variável deve ter valor",
   });
 

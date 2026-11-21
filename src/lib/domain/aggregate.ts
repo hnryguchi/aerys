@@ -33,5 +33,8 @@ export function bucketize(measurements: Measurement[], fromMs: number, toMs: num
       temperaturaC: mean(g.map((m) => m.temperaturaC)),
       umidadePct: mean(g.map((m) => m.umidadePct)),
       pressaoHpa: mean(g.map((m) => m.pressaoHpa)),
+      eco2Ppm: mean(g.map((m) => m.eco2Ppm ?? null)),
+      tvocPpb: mean(g.map((m) => m.tvocPpb ?? null)),
+      iqaUba: mean(g.map((m) => m.iqaUba ?? null)),
     }));
 }
