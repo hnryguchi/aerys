@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import type { DataSource, Measurement, Period, Station } from "../domain/types";
 
 /** Leitura pública. Implementações nunca misturam dados demonstrativos com reais. */

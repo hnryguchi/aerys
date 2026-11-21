@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { getRepository, getSnapshot } from "@/lib/data";
 import { errorJson, json, logEvent } from "@/lib/http";
 import { publicReadLimiter } from "@/lib/security/limiters";

@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { conforto, nivelAr, sensacaoTermica } from "@/lib/domain/air";
 import type { ConnectivityStatus, Measurement } from "@/lib/domain/types";
 import { formatNumber } from "@/lib/format";

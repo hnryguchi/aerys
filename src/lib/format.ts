@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 export const TIME_ZONE = "America/Sao_Paulo";
 const LOCALE = "pt-BR";
 

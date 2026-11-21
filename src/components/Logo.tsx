@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /** Marca AERYS: anel com três linhas de fluxo de ar. */
 export function LogoMark({ size = 28, title }: { size?: number; title?: string }) {
   return (

@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import type { ConnectivityStatus, DataSource, Measurement, Station } from "./types";
 
 /** Janela mínima para considerar a comunicação "recente", independentemente do intervalo. */

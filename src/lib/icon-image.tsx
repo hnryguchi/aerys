@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { ImageResponse } from "next/og";
 
 /** Ícone do app (PNG) desenhado a partir da marca AERYS. `padding` > 0 para ícones "maskable". */

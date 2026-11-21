@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { PERIOD_CONFIG } from "../domain/aggregate";
 import { STATION_CATALOG } from "../domain/stations";
 import type { Measurement, Period, Station } from "../domain/types";

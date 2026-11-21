@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import type { Station } from "./types";
 
 /** Local da Mostra JCC 2026 (mesmo texto gravado no banco pela migração de 20/11). */

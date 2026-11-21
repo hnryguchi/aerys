@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /** Respostas JSON padronizadas. Mensagens de erro são genéricas: sem detalhes internos. */
 export function json(data: unknown, init: ResponseInit & { cache?: string } = {}): Response {
   const headers = new Headers(init.headers);

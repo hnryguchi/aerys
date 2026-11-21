@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import type { Metadata } from "next";
 import { AutoRefresh } from "@/components/AutoRefresh";
 import { DemoBanner } from "@/components/DemoBanner";

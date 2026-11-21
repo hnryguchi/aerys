@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 // AERYS: certificados raiz (CA) públicos aceitos pelo firmware para o HTTPS.
 // Não são segredos: são os mesmos que navegadores e sistemas operacionais já trazem.
 // Cobrem os domínios *.vercel.app (Google Trust Services) e domínios próprios na Vercel

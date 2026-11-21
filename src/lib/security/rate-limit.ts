@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /**
  * Limitador de frequência em memória (janela fixa por chave).
  * Limitação conhecida: é por instância do servidor. Em hospedagem serverless com

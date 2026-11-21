@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /** Origem dos dados exibidos. Somente "local" e "supabase" representam medições reais. */
 export type DataSource = "demo" | "local" | "supabase";
 

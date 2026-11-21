@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { bucketize, PERIOD_CONFIG } from "../domain/aggregate";

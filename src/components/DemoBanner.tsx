@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /** Aviso obrigatório sempre que a fonte de dados for demonstrativa. */
 export const DEMO_NOTICE = "Dados demonstrativos: não são medições reais";
 

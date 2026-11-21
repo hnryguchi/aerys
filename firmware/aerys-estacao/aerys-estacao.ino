@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /*
  * AERYS: firmware da estação (ESP32 DevKit V1 + sensor I2C + OLED SSD1306)
  *

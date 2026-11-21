@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { describe, expect, it } from "vitest";
 import { conforto, nivelAr, nivelPorCo2, sensacaoTermica } from "@/lib/domain/air";
 import { ingestSchema } from "@/lib/security/validation";

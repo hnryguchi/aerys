@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 // Gera QR Codes (SVG e PNG) das estações apontando para a URL pública DEFINITIVA.
 // Uso: npm run qr -- --site https://seu-dominio.com.br [--estacoes aerys-001,aerys-002]
 // Recusa HTTP, localhost, IPs privados e túneis temporários.

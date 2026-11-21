@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Sobre o projeto" };

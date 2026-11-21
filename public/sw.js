@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 /* AERYS service worker: instalação como app e página offline.
  * Estratégias:
  *  - navegação: rede primeiro; sem rede, última versão em cache ou /offline

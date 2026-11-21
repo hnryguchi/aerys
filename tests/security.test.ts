@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 import { describe, expect, it } from "vitest";
 import { hashToken, parseDeviceTokens, verifyDevice } from "@/lib/security/device-auth";
 import { createRateLimiter } from "@/lib/security/rate-limit";

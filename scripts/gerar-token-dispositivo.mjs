@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 // Gera um token aleatório para uma estação e o hash correspondente para o servidor.
 // Uso: npm run device:token -- aerys-001
 // O token aparece UMA vez no terminal: copie-o para firmware/aerys-estacao/secrets.h.

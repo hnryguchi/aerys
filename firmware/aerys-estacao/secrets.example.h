@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 // AERYS: MODELO de segredos da estação.
 // 1. Copie este arquivo para "secrets.h" (mesma pasta). secrets.h é ignorado pelo Git.
 // 2. Preencha os valores. NUNCA coloque chaves do banco de dados aqui.

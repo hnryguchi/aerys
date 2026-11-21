@@ -1,3 +1,4 @@
+// © 2026 Henry Noguchi (github.com/hnryguchi). Todos os direitos reservados / All rights reserved. Ver/see LICENSE.
 // AERYS: configurações NÃO secretas da estação.
 // Segredos (Wi-Fi, token, URL) ficam em secrets.h, que não é versionado.
 #pragma once
