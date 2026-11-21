@@ -19,6 +19,13 @@
   --series-temp: #eb6834;
   --series-umid: #2a78d6;
   --series-pres: #1baf7a;
+  --series-co2: #7a52cc;
+  --series-tvoc: #c2569b;
+  --aq-1: #12a150;
+  --aq-2: #7cbd3a;
+  --aq-3: #e9b824;
+  --aq-4: #ec7a45;
+  --aq-5: #d13c3c;
 
   --good: #0ca30c;
   --good-ink: #075f07;
@@ -56,6 +63,8 @@
     --series-temp: #d95926;
     --series-umid: #3987e5;
     --series-pres: #199e70;
+    --series-co2: #9b7be6;
+    --series-tvoc: #dc72b5;
     --good-ink: #5fd35f;
     --serious-ink: #f0a07f;
     --neutral-ink: #b4c3c8;
@@ -84,6 +93,8 @@
   --series-temp: #d95926;
   --series-umid: #3987e5;
   --series-pres: #199e70;
+  --series-co2: #9b7be6;
+  --series-tvoc: #dc72b5;
   --good-ink: #5fd35f;
   --serious-ink: #f0a07f;
   --neutral-ink: #b4c3c8;
@@ -243,3 +254,66 @@ table.data th { position: sticky; top: 0; background: var(--surface-2); font-wei
 }
 .station-status { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 @media (min-width: 720px) { .station-status { align-items: flex-end; } }
+
+/* Mostra JCC 2026 */
+.mostra-strip { background: color-mix(in srgb, var(--series-co2) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--series-co2) 35%, var(--border)); border-radius: var(--radius-sm); padding: 10px 14px; margin: 0 0 20px; font-size: 0.95rem; }
+.local { display: flex; gap: 6px; align-items: flex-start; margin: 0; color: var(--text-2); }
+.local svg { flex: none; margin-top: 3px; color: var(--accent); }
+
+/* Agora: resumo para o público */
+.airnow { --nivel: var(--accent); border-top: 6px solid var(--nivel); margin-bottom: 8px; animation: subir 0.5s ease-out both; }
+.airnow-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.airnow-title { margin: 0; font-size: 1.1rem; color: var(--text-2); font-weight: 600; }
+.live { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--text-2); }
+.live-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-3); }
+.live--on { color: var(--good-ink); }
+.live--on .live-dot { background: var(--good); animation: pulsar 1.6s ease-out infinite; }
+.airnow-main { display: flex; align-items: center; gap: 16px; margin: 4px 0 18px; }
+.airnow-emoji { font-size: clamp(3rem, 12vw, 4.2rem); line-height: 1; animation: flutuar 3s ease-in-out infinite; }
+.airnow-level { margin: 0; font-size: clamp(1.8rem, 7vw, 2.6rem); font-weight: 750; letter-spacing: -0.02em; line-height: 1.1; color: color-mix(in srgb, var(--nivel) 70%, var(--text)); }
+.airnow-meaning { margin: 4px 0 0; color: var(--text-2); }
+.airnow-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 14px; }
+.fact { background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.fact-label { font-size: 0.8rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.fact-value { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fact-value small { font-size: 0.5em; color: var(--text-2); margin-left: 3px; }
+.fact-text { font-size: 1.05rem; font-weight: 600; }
+.fact-tag { align-self: flex-start; font-size: 0.8rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--surface); }
+.alerta-0 { color: var(--good-ink); }
+.alerta-1 { color: #9a5b00; }
+.alerta-2 { color: var(--serious-ink); }
+.alerta-3 { color: #b42318; }
+
+/* Escala de qualidade do ar */
+.aqscale-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.aqscale-seg { position: relative; border: 0; border-radius: 10px; padding: 10px 2px 8px; color: #10161a; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; opacity: 0.5; transition: opacity 0.2s, transform 0.2s; min-height: 44px; }
+.aqscale-seg:hover { opacity: 0.85; }
+.aqscale-seg.is-atual, .aqscale-seg.is-sel { opacity: 1; }
+.aqscale-seg.is-atual { transform: translateY(-3px); box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.45); }
+.aqscale-seg.is-sel { outline: 3px solid var(--text); outline-offset: 2px; }
+.aqscale-emoji { font-size: 1.3rem; line-height: 1; }
+.aqscale-name { font-size: 0.72rem; font-weight: 700; line-height: 1.1; text-align: center; }
+.aqscale-here { position: absolute; top: -10px; background: var(--text); color: var(--surface); font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.06em; }
+.aqscale-info { margin: 10px 0 0; font-size: 0.95rem; color: var(--text-2); min-height: 2.6em; }
+.ar-pill { --nivel: var(--accent); display: inline-flex; gap: 6px; align-items: center; margin: 12px 0 0; padding: 4px 12px; border-radius: 999px; font-size: 0.9rem; background: color-mix(in srgb, var(--nivel) 18%, var(--surface)); border: 1px solid color-mix(in srgb, var(--nivel) 45%, var(--border)); }
+
+/* Grupos, ajuda e seletor de métrica */
+.group-title { margin: 28px 0 12px; }
+.metric-help { margin-top: 6px; font-size: 0.85rem; }
+.metric-help summary { cursor: pointer; color: var(--accent); font-weight: 600; list-style: none; min-height: 28px; display: inline-flex; align-items: center; }
+.metric-help summary::-webkit-details-marker { display: none; }
+.metric-help summary::before { content: "+"; margin-right: 6px; font-weight: 700; }
+.metric-help[open] summary::before { content: "−"; }
+.metric-help p { margin: 4px 0 0; color: var(--text-2); }
+.history-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin: 36px 0 12px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; margin-bottom: 4px; scrollbar-width: thin; }
+.chips a { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; padding: 8px 14px; min-height: 40px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text-2); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+.chips a[aria-current="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
+
+@keyframes pulsar { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 60%, transparent); } 100% { box-shadow: 0 0 0 10px transparent; } }
+@keyframes flutuar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes subir { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .airnow, .airnow-emoji, .live--on .live-dot { animation: none; }
+  .aqscale-seg { transition: none; }
+}

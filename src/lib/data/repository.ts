@@ -15,6 +15,9 @@ export interface NewMeasurement {
   temperaturaC: number | null;
   umidadePct: number | null;
   pressaoHpa: number | null;
+  eco2Ppm?: number | null;
+  tvocPpb?: number | null;
+  iqaUba?: number | null;
   rssiDbm: number | null;
   firmware: string | null;
 }

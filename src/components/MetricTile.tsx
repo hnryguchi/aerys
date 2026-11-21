@@ -15,6 +15,10 @@ export function MetricTile({ metric, value }: { metric: MetricKey; value: number
         {value !== null && <span className="metric-unit">{d.unidade}</span>}
       </span>
       {value === null && <span className="small muted">Sem leitura disponível</span>}
+      <details className="metric-help">
+        <summary>O que é isso?</summary>
+        <p>{d.explicacao}</p>
+      </details>
     </div>
   );
 }

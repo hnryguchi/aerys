@@ -1,18 +1,21 @@
 import type { Station } from "./types";
 
+/** Local da Mostra JCC 2026 (mesmo texto gravado no banco pela migração de 20/11). */
+export const LOCAL_MOSTRA = "Museu de Arte do Rio (MAR) · Praça Mauá, 5, Centro, Rio de Janeiro";
+
 /**
  * Catálogo de estações usado nos modos "demo" e "local".
  * No modo "supabase" o catálogo vem da tabela public.estacoes.
- * Não declarar localização enquanto não houver instalação definida.
+ * A localização é o local real de instalação (ou null enquanto não houver).
  */
 export const STATION_CATALOG: readonly Station[] = [
   {
     id: "aerys-001",
     nome: "AERYS-001",
-    descricao: "Primeira estação do projeto: protótipo com ESP32, sensor de temperatura, umidade e pressão e display OLED.",
-    localizacao: null,
+    descricao: "Primeira estação do projeto: ESP32 com sensores de clima (temperatura, umidade e pressão), de qualidade do ar e display OLED.",
+    localizacao: LOCAL_MOSTRA,
     intervaloEsperadoS: 60,
-    sensores: ["Temperatura, umidade e pressão (AHT20 + BMP280 ou BME280)"],
+    sensores: ["Temperatura, umidade e pressão (AHT20 + BMP280)", "Qualidade do ar: CO₂ estimado e compostos voláteis (ENS160 + AHT21)"],
   },
 ];
 

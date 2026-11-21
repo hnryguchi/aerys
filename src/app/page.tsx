@@ -52,9 +52,13 @@ export default async function HomePage() {
               <h3>Pressão atmosférica</h3>
               <p className="muted small">Em hectopascal (hPa), útil para observar mudanças de tempo.</p>
             </div>
+            <div className="card">
+              <h3>Qualidade do ar</h3>
+              <p className="muted small">CO₂ estimado e compostos voláteis, num índice de 1 (excelente) a 5 (muito ruim).</p>
+            </div>
           </div>
           <p className="small muted" style={{ marginTop: 12 }}>
-            Sensores de material particulado (PM2.5) e outros indicadores de qualidade do ar estão previstos para versões futuras.
+            Sensor de material particulado (PM2.5) e versão com GPS para postes e praças estão previstos para as próximas versões.
           </p>
         </div>
       </section>

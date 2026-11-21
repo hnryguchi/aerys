@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { PGlite } from "@electric-sql/pglite";
 import { describe, expect, it } from "vitest";
 
@@ -15,8 +15,10 @@ describe("permissões do banco (RLS)", () => {
       create role service_role nologin bypassrls;
       grant usage on schema public to anon, authenticated, service_role;
     `);
-    await db.exec(await readFile("supabase/migrations/20261014000000_estacoes_medicoes.sql", "utf8"));
+    const migrations = (await readdir("supabase/migrations")).filter((f) => f.endsWith(".sql")).sort();
+    await db.exec(await readFile(`supabase/migrations/${migrations[0]}`, "utf8"));
     await db.exec(await readFile("supabase/seed.sql", "utf8"));
+    for (const f of migrations.slice(1)) await db.exec(await readFile(`supabase/migrations/${f}`, "utf8"));
     const testSql = (await readFile("supabase/tests/rls.test.sql", "utf8")).replace(/^\\set .*$/m, "");
     const results = await db.exec(testSql);
     expect(results.at(-1)?.rows[0]).toEqual({ resultado: "RLS_OK" });
