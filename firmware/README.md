@@ -1,6 +1,6 @@
 # Firmware da estação AERYS
 
-_Versão 0.1.0, 16/10/2026. Status: compila com arduino-cli (esp32:esp32:esp32); gravação na placa pendente._
+_Versão 0.2.0, 22/11/2026. Status: estação em produção desde 16/10/2026 (versão 0.1.0); a 0.2.0 adiciona o sensor de qualidade do ar e compila com arduino-cli (esp32:esp32:esp32), falta gravar na placa._
 
 ## Preparação (Arduino IDE 2.x)
 
@@ -17,6 +17,32 @@ _Versão 0.1.0, 16/10/2026. Status: compila com arduino-cli (esp32:esp32:esp32);
    - o **token** vai para `secrets.h` (`AERYS_TOKEN`);
    - o **hash** vai para o servidor (`AERYS_DEVICE_TOKENS`).
 5. Abra `aerys-estacao/aerys-estacao.ino`, compile e grave. Monitor Serial: 115200 baud.
+
+## Sensor de qualidade do ar (ENS160 + AHT21)
+
+O módulo vai num **segundo barramento I2C**, separado do AHT20/BMP280/OLED: o AHT21 do módulo
+usa o endereço 0x38, o mesmo do AHT20, e no mesmo fio os dois colidiriam.
+
+| Módulo ENS160 + AHT21 | ESP32 |
+|---|---|
+| VIN / 3V3 | 3V3 |
+| GND | GND |
+| SDA | GPIO 25 (`PINO_SDA_AR`) |
+| SCL | GPIO 26 (`PINO_SCL_AR`) |
+
+Outros pinos funcionam: é só trocar `PINO_SDA_AR` e `PINO_SCL_AR` em `config.h`.
+Não precisa de biblioteca nova: o firmware fala direto com os registradores do ENS160.
+
+- Sem o módulo, o firmware funciona como antes e o Serial mostra `ENS160: ausente`.
+- Se o módulo for ligado depois, ele é detectado sozinho em até 1 minuto.
+- O ENS160 leva cerca de 3 minutos para aquecer e, **na primeira vez que liga, cerca de 1 hora**
+  para estabilizar. Até lá o display mostra `Ar: aquecendo` / `Ar: 1a partida` e nada de ar é enviado.
+- Com o sensor estável, o display troca a linha da pressão pelo CO2 estimado, e o envio passa a
+  incluir `eco2_ppm`, `tvoc_ppb` e `iqa_uba`.
+- A temperatura e a umidade do AHT20 são passadas ao ENS160 para compensar a medida.
+
+**Antes de gravar esta versão**, aplique a migração `supabase/migrations/20261120000000_qualidade_ar.sql`
+no Supabase de produção. Sem as colunas novas, o servidor recusa as medições que trazem dados de ar.
 
 ## Teste de bancada (sem nuvem)
 

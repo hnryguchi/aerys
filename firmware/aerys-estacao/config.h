@@ -3,11 +3,18 @@
 // Segredos (Wi-Fi, token, URL) ficam em secrets.h, que não é versionado.
 #pragma once
 
-#define AERYS_FIRMWARE_VERSAO "0.1.0"
+#define AERYS_FIRMWARE_VERSAO "0.2.0"
 
 // I2C do ESP32 DevKit V1 (30 pinos)
 #define PINO_SDA 21
 #define PINO_SCL 22
+
+// Segundo barramento I2C (Wire1) só para o módulo de qualidade do ar ENS160 + AHT21.
+// O AHT21 do módulo usa 0x38, o mesmo endereço do AHT20: no mesmo fio os dois colidiriam.
+// Troque os pinos aqui se soldar em outros.
+#define PINO_SDA_AR 25
+#define PINO_SCL_AR 26
+#define ENS160_ENDERECO 0x53   // 0x52 se o pino ADDR do módulo estiver em GND (o firmware tenta os dois)
 
 // Endereços I2C usuais
 #define OLED_ENDERECO 0x3C   // alguns módulos usam 0x3D

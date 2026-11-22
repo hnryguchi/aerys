@@ -6,6 +6,9 @@
  *   - módulo AHT20 + BMP280 (temperatura/umidade no AHT20, pressão no BMP280)
  *   - BME280 (temperatura, umidade e pressão no mesmo chip)
  *   - BMP280 sozinho (temperatura e pressão; umidade enviada como null)
+ *   - ENS160 (qualidade do ar: CO2 equivalente, compostos voláteis e índice UBA),
+ *     opcional, no segundo barramento I2C (PINO_SDA_AR / PINO_SCL_AR). Lido direto
+ *     pelos registradores, sem biblioteca extra. Sem o sensor, nada muda no envio.
  *
  * - Lê os sensores via I2C.
  * - Mostra as leituras no OLED.
@@ -49,11 +52,16 @@ bool ahtOk = false;
 bool bmpOk = false;
 bool bmeOk = false;
 bool oledOk = false;
+bool ensOk = false;
+uint8_t ensEndereco = 0;
 
 struct Leitura {
   float temperaturaC = NAN;
   float umidadePct = NAN;
   float pressaoHpa = NAN;
+  int eco2Ppm = -1;   // -1 = sem leitura válida (enviado como null)
+  int tvocPpb = -1;
+  int iqaUba = -1;
 };
 
 Leitura ultima;
@@ -62,6 +70,82 @@ unsigned long ultimoEnvioMs = 0;
 unsigned long ultimoWifiTentativaMs = 0;
 int ultimoHttpStatus = 0;        // 0 = ainda não enviou
 unsigned long ultimoEnvioOkMs = 0;
+
+// ---------- ENS160 (qualidade do ar) ----------
+// Registradores (datasheet ScioSense ENS160).
+const uint8_t ENS_PART_ID = 0x00, ENS_OPMODE = 0x10, ENS_TEMP_IN = 0x13, ENS_RH_IN = 0x15,
+              ENS_STATUS = 0x20, ENS_AQI = 0x21, ENS_TVOC = 0x22, ENS_ECO2 = 0x24;
+const uint8_t ENS_MODO_PADRAO = 0x02;
+
+bool ensEscrever(uint8_t reg, const uint8_t* dados, size_t n) {
+  Wire1.beginTransmission(ensEndereco);
+  Wire1.write(reg);
+  Wire1.write(dados, n);
+  return Wire1.endTransmission() == 0;
+}
+
+bool ensLer(uint8_t reg, uint8_t* dados, size_t n) {
+  Wire1.beginTransmission(ensEndereco);
+  Wire1.write(reg);
+  if (Wire1.endTransmission(false) != 0) return false;
+  if (Wire1.requestFrom(ensEndereco, (uint8_t)n) != n) return false;
+  for (size_t i = 0; i < n; i++) dados[i] = Wire1.read();
+  return true;
+}
+
+void iniciarEns160() {
+  ensOk = false;
+  const uint8_t enderecos[] = {ENS160_ENDERECO, (uint8_t)(ENS160_ENDERECO ^ 0x01)};
+  for (uint8_t e : enderecos) {
+    ensEndereco = e;
+    uint8_t id[2];
+    if (ensLer(ENS_PART_ID, id, 2) && id[0] == 0x60 && id[1] == 0x01) {
+      uint8_t modo = ENS_MODO_PADRAO;
+      ensOk = ensEscrever(ENS_OPMODE, &modo, 1);
+      break;
+    }
+  }
+  Serial.printf("[sensores] ENS160: %s\n", ensOk ? "ok" : "ausente (ok se o modulo de ar nao estiver ligado)");
+}
+
+// Compensação com a temperatura e a umidade reais da estação (melhora a estimativa do ENS160).
+void compensarEns160(const Leitura& l) {
+  if (!ensOk || isnan(l.temperaturaC) || isnan(l.umidadePct)) return;
+  uint16_t t = (uint16_t)lroundf((l.temperaturaC + 273.15f) * 64.0f);
+  uint16_t h = (uint16_t)lroundf(l.umidadePct * 512.0f);
+  uint8_t bt[2] = {(uint8_t)(t & 0xFF), (uint8_t)(t >> 8)};
+  uint8_t bh[2] = {(uint8_t)(h & 0xFF), (uint8_t)(h >> 8)};
+  ensEscrever(ENS_TEMP_IN, bt, 2);
+  ensEscrever(ENS_RH_IN, bh, 2);
+}
+
+void lerEns160(Leitura& l) {
+  if (!ensOk) return;
+  uint8_t st;
+  if (!ensLer(ENS_STATUS, &st, 1)) return;
+  uint8_t validade = (st >> 2) & 0x03;  // 0 normal, 1 aquecendo, 2 primeira partida, 3 inválido
+  if (validade != 0) return;            // nada é enviado enquanto o sensor não estabiliza
+  uint8_t d[5];
+  if (!ensLer(ENS_AQI, d, 5)) return;  // AQI (1 byte), TVOC (2), eCO2 (2), little-endian
+  int iqa = d[0] & 0x07;
+  int tvoc = d[1] | (d[2] << 8);
+  int eco2 = d[3] | (d[4] << 8);
+  if (iqa >= 1 && iqa <= 5) l.iqaUba = iqa;
+  if (tvoc >= 0 && tvoc <= 65000) l.tvocPpb = tvoc;
+  if (eco2 >= 400 && eco2 <= 65000) l.eco2Ppm = eco2;
+}
+
+const char* estadoEns160() {
+  if (!ensOk) return "";
+  uint8_t st;
+  if (!ensLer(ENS_STATUS, &st, 1)) return "erro";
+  switch ((st >> 2) & 0x03) {
+    case 0: return "ok";
+    case 1: return "aquecendo";
+    case 2: return "1a partida";
+    default: return "invalido";
+  }
+}
 
 // ---------- Sensores ----------
 
@@ -84,6 +168,7 @@ void iniciarSensores() {
   Serial.printf("[sensores] AHT20: %s | BME280: %s | BMP280: %s\n", ahtOk ? "ok" : "ausente",
                 bmeOk ? "ok" : "ausente", bmpOk ? "ok" : "ausente");
   if (!ahtOk && !pressaoOk()) Serial.println("[sensores] NENHUM sensor encontrado: confira 3V3, GND, SDA=21, SCL=22");
+  iniciarEns160();
 }
 
 Leitura lerSensores() {
@@ -117,6 +202,8 @@ Leitura lerSensores() {
       if (valido(t, -40, 85)) l.temperaturaC = t;
     }
   }
+  compensarEns160(l);
+  lerEns160(l);
   return l;
 }
 
@@ -151,9 +238,16 @@ void desenharDisplay() {
   oled.print("Umid: ");
   oled.print(buf);
   oled.setCursor(0, 46);
-  textoValor(ultima.pressaoHpa, 1, "hPa", buf, sizeof buf);
-  oled.print("Pres: ");
-  oled.print(buf);
+  if (ensOk) {
+    // Com o sensor de ar, a linha mostra o CO2 estimado (ou o estado do aquecimento).
+    if (ultima.eco2Ppm > 0) snprintf(buf, sizeof buf, "CO2: %d ppm", ultima.eco2Ppm);
+    else snprintf(buf, sizeof buf, "Ar: %s", estadoEns160());
+    oled.print(buf);
+  } else {
+    textoValor(ultima.pressaoHpa, 1, "hPa", buf, sizeof buf);
+    oled.print("Pres: ");
+    oled.print(buf);
+  }
 
   oled.setCursor(0, 56);
   if (ultimoHttpStatus == 0) {
@@ -197,7 +291,7 @@ void anexarNumero(String& json, const char* campo, float v, int casas, bool virg
 }
 
 int enviarMedicao(const Leitura& l) {
-  if (isnan(l.temperaturaC) && isnan(l.umidadePct) && isnan(l.pressaoHpa)) {
+  if (isnan(l.temperaturaC) && isnan(l.umidadePct) && isnan(l.pressaoHpa) && l.eco2Ppm < 0) {
     Serial.println("[envio] nenhum sensor com leitura valida; nada enviado");
     return -10;
   }
@@ -206,6 +300,10 @@ int enviarMedicao(const Leitura& l) {
   anexarNumero(json, "temperatura_c", l.temperaturaC, 2, true);
   anexarNumero(json, "umidade_pct", l.umidadePct, 1, true);
   anexarNumero(json, "pressao_hpa", l.pressaoHpa, 2, true);
+  // Campos do ar só vão quando há leitura válida (sensor presente e já estabilizado).
+  if (l.eco2Ppm >= 0) json += "\"eco2_ppm\":" + String(l.eco2Ppm) + ",";
+  if (l.tvocPpb >= 0) json += "\"tvoc_ppb\":" + String(l.tvocPpb) + ",";
+  if (l.iqaUba >= 0) json += "\"iqa_uba\":" + String(l.iqaUba) + ",";
   json += "\"rssi_dbm\":" + String(WiFi.RSSI()) + ",";
   json += "\"firmware\":\"" AERYS_FIRMWARE_VERSAO "\"}";
 
@@ -251,6 +349,7 @@ void setup() {
   Serial.println("AERYS estacao " AERYS_FIRMWARE_VERSAO " - " AERYS_ESTACAO_ID);
 
   Wire.begin(PINO_SDA, PINO_SCL);
+  Wire1.begin(PINO_SDA_AR, PINO_SCL_AR);
   oledOk = oled.begin(SSD1306_SWITCHCAPVCC, OLED_ENDERECO);
   if (!oledOk) Serial.println("[oled] display nao encontrado");
   if (oledOk) {
@@ -286,6 +385,7 @@ void loop() {
   if (agora - ultimoEnvioMs >= INTERVALO_ENVIO_MS) {
     ultimoEnvioMs = agora;
     if (!ahtOk && !pressaoOk()) iniciarSensores();  // nova tentativa caso um sensor tenha sido reconectado
+    else if (!ensOk) iniciarEns160();               // módulo de ar soldado/ligado depois
     if (WiFi.status() == WL_CONNECTED) {
       ultimoHttpStatus = enviarMedicao(ultima);
       if (ultimoHttpStatus == 201) ultimoEnvioOkMs = millis();
