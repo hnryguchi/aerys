@@ -1,0 +1,31 @@
+# Mantém o Supabase (plano gratuito) ativo: ele pausa após 7 dias sem uso.
+# Uma vez por dia, lê a lista de estações pela API pública do site, o que faz uma consulta real no banco.
+# Não usa nenhuma chave. Se o banco estiver fora, a execução falha e o GitHub avisa por e-mail.
+name: Manter banco ativo
+
+on:
+  schedule:
+    - cron: "17 11 * * *" # todo dia às 08:17 (Brasília)
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Consultar a API pública
+        run: |
+          for tentativa in 1 2 3; do
+            status=$(curl -s -o resposta.json -w "%{http_code}" "https://aerys-mu.vercel.app/api/v1/estacoes?t=$(date +%s)")
+            echo "tentativa $tentativa: HTTP $status"
+            if [ "$status" = "200" ] && grep -q '"fonte":"supabase"' resposta.json; then
+              echo "banco ativo"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::error::A API não confirmou leitura no banco (pausado ou fora do ar)."
+          head -c 300 resposta.json
+          exit 1
