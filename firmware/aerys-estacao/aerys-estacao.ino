@@ -77,35 +77,44 @@ const uint8_t ENS_PART_ID = 0x00, ENS_OPMODE = 0x10, ENS_TEMP_IN = 0x13, ENS_RH_
               ENS_STATUS = 0x20, ENS_AQI = 0x21, ENS_TVOC = 0x22, ENS_ECO2 = 0x24;
 const uint8_t ENS_MODO_PADRAO = 0x02;
 
+TwoWire* ensBus = &Wire;  // definido na detecção: barramento principal ou o segundo
+
 bool ensEscrever(uint8_t reg, const uint8_t* dados, size_t n) {
-  Wire1.beginTransmission(ensEndereco);
-  Wire1.write(reg);
-  Wire1.write(dados, n);
-  return Wire1.endTransmission() == 0;
+  ensBus->beginTransmission(ensEndereco);
+  ensBus->write(reg);
+  ensBus->write(dados, n);
+  return ensBus->endTransmission() == 0;
 }
 
 bool ensLer(uint8_t reg, uint8_t* dados, size_t n) {
-  Wire1.beginTransmission(ensEndereco);
-  Wire1.write(reg);
-  if (Wire1.endTransmission(false) != 0) return false;
-  if (Wire1.requestFrom(ensEndereco, (uint8_t)n) != n) return false;
-  for (size_t i = 0; i < n; i++) dados[i] = Wire1.read();
+  ensBus->beginTransmission(ensEndereco);
+  ensBus->write(reg);
+  if (ensBus->endTransmission(false) != 0) return false;
+  if (ensBus->requestFrom(ensEndereco, (uint8_t)n) != n) return false;
+  for (size_t i = 0; i < n; i++) dados[i] = ensBus->read();
   return true;
 }
 
 void iniciarEns160() {
   ensOk = false;
+  // Procura primeiro no barramento principal (módulo ligado junto do AHT20/BMP280) e depois no segundo.
   const uint8_t enderecos[] = {ENS160_ENDERECO, (uint8_t)(ENS160_ENDERECO ^ 0x01)};
-  for (uint8_t e : enderecos) {
-    ensEndereco = e;
-    uint8_t id[2];
-    if (ensLer(ENS_PART_ID, id, 2) && id[0] == 0x60 && id[1] == 0x01) {
-      uint8_t modo = ENS_MODO_PADRAO;
-      ensOk = ensEscrever(ENS_OPMODE, &modo, 1);
-      break;
+  TwoWire* barramentos[] = {&Wire, &Wire1};
+  for (TwoWire* b : barramentos) {
+    for (uint8_t e : enderecos) {
+      ensBus = b;
+      ensEndereco = e;
+      uint8_t id[2];
+      if (ensLer(ENS_PART_ID, id, 2) && id[0] == 0x60 && id[1] == 0x01) {
+        uint8_t modo = ENS_MODO_PADRAO;
+        ensOk = ensEscrever(ENS_OPMODE, &modo, 1);
+        break;
+      }
     }
+    if (ensOk) break;
   }
-  Serial.printf("[sensores] ENS160: %s\n", ensOk ? "ok" : "ausente (ok se o modulo de ar nao estiver ligado)");
+  if (ensOk) Serial.printf("[sensores] ENS160: ok (0x%02X, %s)\n", ensEndereco, ensBus == &Wire ? "barramento principal" : "segundo barramento");
+  else Serial.println("[sensores] ENS160: ausente (ok se o modulo de ar nao estiver ligado)");
 }
 
 // Compensação com a temperatura e a umidade reais da estação (melhora a estimativa do ENS160).
