@@ -1,6 +1,6 @@
 # Firmware da estação AERYS
 
-_Versão 0.2.0, 22/11/2026. Status: estação em produção desde 16/10/2026 (versão 0.1.0); a 0.2.0 adiciona o sensor de qualidade do ar e compila com arduino-cli (esp32:esp32:esp32), falta gravar na placa._
+_Versão 0.2.3, 24/11/2026. Status: gravada na placa AERYS-001, enviando HTTP 201, com ENS160 detectado. Primeira versão em produção: 0.1.0 (16/10/2026)._
 
 ## Preparação (Arduino IDE 2.x)
 
@@ -20,8 +20,10 @@ _Versão 0.2.0, 22/11/2026. Status: estação em produção desde 16/10/2026 (ve
 
 ## Sensor de qualidade do ar (ENS160 + AHT21)
 
-O módulo vai num **segundo barramento I2C**, separado do AHT20/BMP280/OLED: o AHT21 do módulo
-usa o endereço 0x38, o mesmo do AHT20, e no mesmo fio os dois colidiriam.
+O firmware procura o ENS160 (0x53 ou 0x52) primeiro no **barramento principal** (SDA 21 / SCL 22,
+junto do AHT20/BMP280/OLED) e depois num **segundo barramento** (GPIO 25/26). Na AERYS-001 ele está
+no principal. Se o módulo tiver um AHT21 respondendo em 0x38, prefira o segundo barramento, porque o
+AHT20 usa o mesmo endereço e os dois colidiriam.
 
 | Módulo ENS160 + AHT21 | ESP32 |
 |---|---|
@@ -37,8 +39,11 @@ Não precisa de biblioteca nova: o firmware fala direto com os registradores do 
 - Se o módulo for ligado depois, ele é detectado sozinho em até 1 minuto.
 - O ENS160 leva cerca de 3 minutos para aquecer e, **na primeira vez que liga, cerca de 1 hora**
   para estabilizar. Até lá o display mostra `Ar: aquecendo` / `Ar: 1a partida` e nada de ar é enviado.
-- Com o sensor estável, o display troca a linha da pressão pelo CO2 estimado, e o envio passa a
-  incluir `eco2_ppm`, `tvoc_ppb` e `iqa_uba`.
+- Com o sensor de ar, a linha da pressão no display vira o nível do ar com os mesmos nomes do site
+  (Excelente, Bom, Moderado, Ruim, Muito ruim). Durante o aquecimento aparece "(aquecendo)" e o valor
+  não é enviado. Com o sensor estável, o envio passa a incluir `eco2_ppm`, `tvoc_ppb` e `iqa_uba`.
+- O Serial mostra a cada 30 s a leitura bruta: `[ar] status=... validade=... eco2=... tvoc=... iqa=...`
+  (validade 0 = normal, 1 = aquecendo, 2 = primeira partida).
 - A temperatura e a umidade do AHT20 são passadas ao ENS160 para compensar a medida.
 
 **Antes de gravar esta versão**, aplique a migração `supabase/migrations/20261120000000_qualidade_ar.sql`

@@ -129,6 +129,7 @@ void compensarEns160(const Leitura& l) {
 }
 
 int ensEco2Provisorio = -1;  // leitura durante o aquecimento: só no display/Serial, nunca enviada
+int ensIqaProvisorio = -1;
 unsigned long ensUltimoLogMs = 0;
 
 void lerEns160(Leitura& l) {
@@ -147,9 +148,11 @@ void lerEns160(Leitura& l) {
   }
   if (validade != 0) {  // nada é enviado enquanto o sensor não estabiliza
     ensEco2Provisorio = (eco2 >= 400 && eco2 <= 65000) ? eco2 : -1;
+    ensIqaProvisorio = (iqa >= 1 && iqa <= 5) ? iqa : -1;
     return;
   }
   ensEco2Provisorio = -1;
+  ensIqaProvisorio = -1;
   if (iqa >= 1 && iqa <= 5) l.iqaUba = iqa;
   if (tvoc >= 0 && tvoc <= 65000) l.tvocPpb = tvoc;
   if (eco2 >= 400 && eco2 <= 65000) l.eco2Ppm = eco2;
@@ -260,9 +263,14 @@ void desenharDisplay() {
   oled.setCursor(0, 46);
   if (ensOk) {
     // Com o sensor de ar, a linha mostra o CO2 estimado (ou o estado do aquecimento).
-    if (ultima.eco2Ppm > 0) snprintf(buf, sizeof buf, "CO2: %d ppm", ultima.eco2Ppm);
-    // Durante o aquecimento mostra o valor provisório com "~" (não é enviado ao site).
-    else if (ensEco2Provisorio > 0) snprintf(buf, sizeof buf, "CO2 ~%d (aquec.)", ensEco2Provisorio);
+    // Mesmos rótulos do site (escala UBA do ENS160). Durante o aquecimento o nível é provisório
+    // e aparece marcado; ele não é enviado ao site.
+    static const char* ROTULOS[] = {"", "Excelente", "Bom", "Moderado", "Ruim", "Muito ruim"};
+    if (ultima.iqaUba >= 1 && ultima.iqaUba <= 5) snprintf(buf, sizeof buf, "Ar: %s", ROTULOS[ultima.iqaUba]);
+    else if (ensIqaProvisorio >= 1 && ensIqaProvisorio <= 5) {
+      snprintf(buf, sizeof buf, "Ar: %s (aquecendo)", ROTULOS[ensIqaProvisorio]);
+      if (strlen(buf) > 21) snprintf(buf, sizeof buf, "Ar: %s ~", ROTULOS[ensIqaProvisorio]);
+    }
     else snprintf(buf, sizeof buf, "Ar: %s", estadoEns160());
     oled.print(buf);
   } else {
