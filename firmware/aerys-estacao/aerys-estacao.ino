@@ -128,17 +128,28 @@ void compensarEns160(const Leitura& l) {
   ensEscrever(ENS_RH_IN, bh, 2);
 }
 
+int ensEco2Provisorio = -1;  // leitura durante o aquecimento: só no display/Serial, nunca enviada
+unsigned long ensUltimoLogMs = 0;
+
 void lerEns160(Leitura& l) {
   if (!ensOk) return;
   uint8_t st;
   if (!ensLer(ENS_STATUS, &st, 1)) return;
   uint8_t validade = (st >> 2) & 0x03;  // 0 normal, 1 aquecendo, 2 primeira partida, 3 inválido
-  if (validade != 0) return;            // nada é enviado enquanto o sensor não estabiliza
   uint8_t d[5];
   if (!ensLer(ENS_AQI, d, 5)) return;  // AQI (1 byte), TVOC (2), eCO2 (2), little-endian
   int iqa = d[0] & 0x07;
   int tvoc = d[1] | (d[2] << 8);
   int eco2 = d[3] | (d[4] << 8);
+  if (millis() - ensUltimoLogMs >= 30000UL) {
+    ensUltimoLogMs = millis();
+    Serial.printf("[ar] status=0x%02X validade=%u eco2=%d tvoc=%d iqa=%d\n", st, validade, eco2, tvoc, iqa);
+  }
+  if (validade != 0) {  // nada é enviado enquanto o sensor não estabiliza
+    ensEco2Provisorio = (eco2 >= 400 && eco2 <= 65000) ? eco2 : -1;
+    return;
+  }
+  ensEco2Provisorio = -1;
   if (iqa >= 1 && iqa <= 5) l.iqaUba = iqa;
   if (tvoc >= 0 && tvoc <= 65000) l.tvocPpb = tvoc;
   if (eco2 >= 400 && eco2 <= 65000) l.eco2Ppm = eco2;
@@ -250,6 +261,8 @@ void desenharDisplay() {
   if (ensOk) {
     // Com o sensor de ar, a linha mostra o CO2 estimado (ou o estado do aquecimento).
     if (ultima.eco2Ppm > 0) snprintf(buf, sizeof buf, "CO2: %d ppm", ultima.eco2Ppm);
+    // Durante o aquecimento mostra o valor provisório com "~" (não é enviado ao site).
+    else if (ensEco2Provisorio > 0) snprintf(buf, sizeof buf, "CO2 ~%d (aquec.)", ensEco2Provisorio);
     else snprintf(buf, sizeof buf, "Ar: %s", estadoEns160());
     oled.print(buf);
   } else {
