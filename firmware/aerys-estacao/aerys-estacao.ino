@@ -146,7 +146,9 @@ void lerEns160(Leitura& l) {
     ensUltimoLogMs = millis();
     Serial.printf("[ar] status=0x%02X validade=%u eco2=%d tvoc=%d iqa=%d\n", st, validade, eco2, tvoc, iqa);
   }
-  if (validade != 0) {  // nada é enviado enquanto o sensor não estabiliza
+  // Validade 3 = leitura inválida: nunca é enviada. Na primeira partida (2) e no aquecimento (1)
+  // as medições são reais, mas menos precisas; desde a 0.2.4 elas são enviadas (decisão para a Mostra JCC).
+  if (validade == 3) {
     ensEco2Provisorio = (eco2 >= 400 && eco2 <= 65000) ? eco2 : -1;
     ensIqaProvisorio = (iqa >= 1 && iqa <= 5) ? iqa : -1;
     return;

@@ -3,7 +3,7 @@
 // Segredos (Wi-Fi, token, URL) ficam em secrets.h, que não é versionado.
 #pragma once
 
-#define AERYS_FIRMWARE_VERSAO "0.2.3"
+#define AERYS_FIRMWARE_VERSAO "0.2.4"
 
 // I2C do ESP32 DevKit V1 (30 pinos)
 #define PINO_SDA 21
